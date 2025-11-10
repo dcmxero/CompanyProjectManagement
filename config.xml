@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+	<product>
+		<name>Company Project Management</name>
+		<version>1.0.0</version>
+		<author>Marek</author>
+		<year>2025</year>
+	</product>
+
+	<storage>
+		<projectsPath>../data/projects.xml</projectsPath>
+		<encoding>windows-1250</encoding>
+	</storage>
+
+	<auth>
+		<username>admin</username>
+		<passwordHash>$2a$11$6J2P1uhRjLz1bC1vGAmKHe3IN3drY8h4LbRkE.LbYyvzV4tOkp1de</passwordHash>
+	</auth>
+
+	<logging>
+		<logPath>../logs/app-.log</logPath>
+		<fileSizeLimit>10</fileSizeLimit>
+		<retainedFiles>5</retainedFiles>
+		<minimumLevel>Information</minimumLevel>
+	</logging>
+</configuration>
