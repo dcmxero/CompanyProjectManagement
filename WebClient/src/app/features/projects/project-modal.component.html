@@ -1,0 +1,84 @@
+<!-- BACKDROP -->
+<div class="backdrop" (click)="onClose()"></div>
+
+<!-- MODAL -->
+<div class="modal" role="dialog" aria-modal="true" (click)="onClose()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">{{ isNew ? 'Create project' : 'Edit project' }}</h3>
+      <button class="modal-close" type="button" (click)="onClose()" aria-label="Close">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M3 3l6 6M9 3L3 9" stroke="#444" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    <form class="modal-content" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <!-- Name -->
+      <div class="row">
+        <label for="name">Name <span class="req">*</span></label>
+        <input id="name" class="input" formControlName="name" [class.invalid]="error('name')" />
+        <small class="err" *ngIf="error('name')">
+          <ng-container *ngIf="form.get('name')?.hasError('required'); else nameLen">
+            Name is required.
+          </ng-container>
+          <ng-template #nameLen>
+            <ng-container *ngIf="form.get('name')?.hasError('maxlength')"
+              >Max 200 characters.</ng-container
+            >
+          </ng-template>
+        </small>
+      </div>
+
+      <!-- Abbreviation -->
+      <div class="row">
+        <label for="abbr">Abbreviation <span class="req">*</span></label>
+        <input
+          id="abbr"
+          class="input"
+          formControlName="abbreviation"
+          [class.invalid]="error('abbreviation')"
+        />
+        <small class="err" *ngIf="error('abbreviation')">
+          <ng-container *ngIf="form.get('abbreviation')?.hasError('required'); else abbrLen">
+            Abbreviation is required.
+          </ng-container>
+          <ng-template #abbrLen>
+            <ng-container *ngIf="form.get('abbreviation')?.hasError('maxlength')"
+              >Max 100 characters.</ng-container
+            >
+          </ng-template>
+        </small>
+      </div>
+
+      <!-- Customer -->
+      <div class="row">
+        <label for="cust">Customer <span class="req">*</span></label>
+        <input
+          id="cust"
+          class="input"
+          formControlName="customer"
+          [class.invalid]="error('customer')"
+        />
+        <small class="err" *ngIf="error('customer')">
+          <ng-container *ngIf="form.get('customer')?.hasError('required'); else custLen">
+            Customer is required.
+          </ng-container>
+          <ng-template #custLen>
+            <ng-container *ngIf="form.get('customer')?.hasError('maxlength')"
+              >Max 200 characters.</ng-container
+            >
+          </ng-template>
+        </small>
+      </div>
+
+      <p *ngIf="formError" class="err">{{ formError }}</p>
+
+      <div class="modal-actions">
+        <button class="btn primary" type="submit">
+          {{ isNew ? 'Create' : 'Save' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

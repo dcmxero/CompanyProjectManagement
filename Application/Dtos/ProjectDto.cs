@@ -1,7 +1,7 @@
 ﻿namespace Application.Dtos;
 
 /// <summary>
-/// Data transfer object for Project update.
+/// Data transfer object for Project.
 /// </summary>
 public sealed class ProjectDto
 {

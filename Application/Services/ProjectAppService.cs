@@ -36,11 +36,6 @@ public sealed class ProjectAppService(IXmlProjectRepository repo) : IProjectAppS
         return (true, MapToDto(saved), null);
     }
 
-    /// <summary>
-    /// Validation rules:
-    /// - Id must be provided and must already exist.
-    /// - Name, Abbreviation, Customer must not be empty.
-    /// </summary>
     public async Task<(bool Ok, ProjectDto? Data, string? Error)> UpdateAsync(ProjectDto dto, CancellationToken cancellationToken = default)
     {
         var err = ValidateUpdate(dto);
@@ -76,6 +71,11 @@ public sealed class ProjectAppService(IXmlProjectRepository repo) : IProjectAppS
 
     #region private methods
 
+    /// <summary>
+    /// Validates a new project request and returns a validation error message if invalid.
+    /// </summary>
+    /// <param name="d">CreateProjectDto containing data for the new project.</param>
+    /// <returns>Validation error message if invalid; otherwise null.</returns>
     private static string? Validate(CreateProjectDto d)
     {
         if (string.IsNullOrWhiteSpace(d.Name))
@@ -93,13 +93,17 @@ public sealed class ProjectAppService(IXmlProjectRepository repo) : IProjectAppS
         return null;
     }
 
+    /// <summary>
+    /// Validates an update request for an existing project and returns a validation error message if invalid.
+    /// </summary>
+    /// <param name="d">ProjectDto containing data to update the project.</param>
+    /// <returns>Validation error message if invalid; otherwise null.</returns>
     private static string? ValidateUpdate(ProjectDto d)
     {
         if (string.IsNullOrWhiteSpace(d.Id))
         {
             return "Project Id must not be empty.";
         }
-
         if (string.IsNullOrWhiteSpace(d.Name))
         {
             return "Project name must not be empty.";
@@ -115,6 +119,11 @@ public sealed class ProjectAppService(IXmlProjectRepository repo) : IProjectAppS
         return null;
     }
 
+    /// <summary>
+    /// Maps a Project entity to a ProjectDto.
+    /// </summary>
+    /// <param name="e">Project entity to map from.</param>
+    /// <returns>Mapped ProjectDto.</returns>
     private static ProjectDto MapToDto(Project e)
     {
         return new ProjectDto
@@ -126,6 +135,11 @@ public sealed class ProjectAppService(IXmlProjectRepository repo) : IProjectAppS
         };
     }
 
+    /// <summary>
+    /// Maps a CreateProjectDto to a new Project entity.
+    /// </summary>
+    /// <param name="d">CreateProjectDto to map from.</param>
+    /// <returns>New Project entity.</returns>
     private static Project MapToEntity(CreateProjectDto d)
     {
         return new Project
@@ -136,6 +150,11 @@ public sealed class ProjectAppService(IXmlProjectRepository repo) : IProjectAppS
         };
     }
 
+    /// <summary>
+    /// Maps a ProjectDto to a Project entity for updates.
+    /// </summary>
+    /// <param name="d">ProjectDto to map from.</param>
+    /// <returns>Project entity populated from the DTO.</returns>
     private static Project MapUpdateToEntity(ProjectDto d)
     {
         return new Project
@@ -148,8 +167,10 @@ public sealed class ProjectAppService(IXmlProjectRepository repo) : IProjectAppS
     }
 
     /// <summary>
-    /// Generates next project id in format 'prj' + (max numeric suffix + 1).
+    /// Generates the next project identifier in the format 'prj' + (max numeric suffix + 1).
     /// </summary>
+    /// <param name="existingIds">Collection of existing project identifiers.</param>
+    /// <returns>New project identifier.</returns>
     private static string GenerateNextId(IEnumerable<string> existingIds)
     {
         var max = 0;

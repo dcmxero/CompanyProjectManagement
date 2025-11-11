@@ -30,7 +30,6 @@ public sealed class XmlProjectRepository : IXmlProjectRepository
         }
     }
 
-    /// <inheritdoc/>
     public Task<IReadOnlyList<Project>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var doc = Load();
@@ -47,7 +46,6 @@ public sealed class XmlProjectRepository : IXmlProjectRepository
         return Task.FromResult<IReadOnlyList<Project>>(items);
     }
 
-    /// <inheritdoc/>
     public Task<Project?> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
         var doc = Load();
@@ -66,7 +64,6 @@ public sealed class XmlProjectRepository : IXmlProjectRepository
         return Task.FromResult<Project?>(p);
     }
 
-    /// <inheritdoc/>
     public Task<Project> UpsertAsync(Project project, CancellationToken cancellationToken = default)
     {
         var doc = Load();
@@ -96,8 +93,6 @@ public sealed class XmlProjectRepository : IXmlProjectRepository
         return Task.FromResult(project);
     }
 
-
-    /// <inheritdoc/>
     public Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
         var doc = Load();
@@ -112,12 +107,22 @@ public sealed class XmlProjectRepository : IXmlProjectRepository
         return Task.FromResult(true);
     }
 
+    #region private methods
+
+    /// <summary>
+    /// Loads an XML document from the configured file path using the specified encoding.
+    /// </summary>
+    /// <returns>Loaded XDocument instance.</returns>
     private XDocument Load()
     {
         using var reader = new StreamReader(_filePath, _encoding, true);
         return XDocument.Load(reader, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
     }
 
+    /// <summary>
+    /// Saves the specified XML document to the configured file path using the specified encoding.
+    /// </summary>
+    /// <param name="doc">XML document to save.</param>
     private void Save(XDocument doc)
     {
         using var fs = new FileStream(_filePath, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -125,6 +130,10 @@ public sealed class XmlProjectRepository : IXmlProjectRepository
         doc.Save(writer);
     }
 
+    /// <summary>
+    /// Ensures that the directory for the specified file path exists, creating it if necessary.
+    /// </summary>
+    /// <param name="filePath">File path for which to ensure the directory exists.</param>
     private static void TryEnsureDirectory(string filePath)
     {
         var dir = Path.GetDirectoryName(Path.GetFullPath(filePath));
@@ -134,6 +143,11 @@ public sealed class XmlProjectRepository : IXmlProjectRepository
         }
     }
 
+    /// <summary>
+    /// Gets the specified text encoding, registering the provider if needed. Returns UTF-8 if the encoding is not found.
+    /// </summary>
+    /// <param name="encodingName">Name of the encoding to retrieve.</param>
+    /// <returns>Encoding instance for the specified encoding name, or UTF-8 if unavailable.</returns>
     private static Encoding GetEncoding(string encodingName)
     {
         try
@@ -146,4 +160,7 @@ public sealed class XmlProjectRepository : IXmlProjectRepository
             return new UTF8Encoding(false);
         }
     }
+
+
+    #endregion
 }

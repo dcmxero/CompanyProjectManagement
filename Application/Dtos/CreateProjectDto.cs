@@ -1,7 +1,7 @@
 ﻿namespace Application.Dtos;
 
 /// <summary>
-/// Data transfer object for Project.
+/// Data transfer object for Project creation.
 /// </summary>
 public class CreateProjectDto
 {

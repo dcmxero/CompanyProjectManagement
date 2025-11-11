@@ -1,0 +1,60 @@
+<!-- Fixed toolbar -->
+<div class="fixed-toolbar">
+  <div class="fixed-toolbar-inner">
+    <button class="logout-fab" (click)="logout()" aria-label="Logout">Logout</button>
+  </div>
+</div>
+
+<div class="page">
+  <div class="card">
+    <header class="bar">
+      <h2>Projects</h2>
+      <div class="actions">
+        <button class="btn primary" (click)="openCreate()">+ New</button>
+      </div>
+    </header>
+
+    <div *ngIf="!items.length" class="empty">No projects found.</div>
+
+    <table class="grid" *ngIf="items.length">
+      <thead>
+        <tr>
+          <th style="width: 110px">Id</th>
+          <th>Name</th>
+          <th style="width: 150px">Abbrev.</th>
+          <th>Customer</th>
+          <th style="width: 120px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of items; trackBy: track">
+          <td>
+            <strong>{{ p.id }}</strong>
+          </td>
+          <td>{{ p.name }}</td>
+          <td>{{ p.abbreviation }}</td>
+          <td>{{ p.customer }}</td>
+          <td class="right">
+            <button class="btn sm" (click)="openEdit(p.id)">Edit</button>
+            <button class="btn sm danger" (click)="remove(p.id)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p *ngIf="error" class="err">{{ error }}</p>
+  </div>
+</div>
+
+<!-- Modal component -->
+<app-project-modal
+  *ngIf="modalOpen"
+  [form]="form"
+  [isNew]="isNew"
+  [submitted]="submitted"
+  [formError]="formError"
+  (save)="save()"
+  (close)="close()"
+  (remove)="remove(currentId!)"
+>
+</app-project-modal>

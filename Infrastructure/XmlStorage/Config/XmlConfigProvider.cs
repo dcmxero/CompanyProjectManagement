@@ -4,25 +4,32 @@ using System.Xml.Linq;
 namespace Infrastructure.XmlStorage.Config;
 
 /// <summary>
-/// Loads XML storage configuration from config.xml.
+/// Loads and parses XML storage configuration from the specified config.xml file.
 /// </summary>
 public sealed class XmlConfigProvider
 {
     /// <summary>
-    /// Gets the configuration loaded from XML.
+    /// Gets the storage configuration loaded from XML.
     /// </summary>
     public XmlStorageConfig Config { get; }
 
     /// <summary>
-    /// Gets the authentication configuration.
+    /// Gets the authentication configuration loaded from XML.
     /// </summary>
     public AuthConfig Auth { get; }
 
+    /// <summary>
+    /// Gets the directory path of the configuration file.
+    /// </summary>
     public string ConfigDirectory { get; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlConfigProvider"/> class and loads configuration from XML.
+    /// </summary>
+    /// <param name="configFilePath">Path to the configuration XML file. Defaults to './config.xml'.</param>
     public XmlConfigProvider(string configFilePath = "./config.xml")
     {
-        ConfigDirectory = Path.GetDirectoryName(Path.GetFullPath(configFilePath)) ?? Directory.GetCurrentDirectory();
+        ConfigDirectory = Directory.GetCurrentDirectory();
 
         if (!File.Exists(configFilePath))
         {
@@ -56,6 +63,9 @@ public sealed class XmlConfigProvider
         TryRegisterEncodingProvider(Config.EncodingName);
     }
 
+    /// <summary>
+    /// Ensures the projects path is an absolute path.
+    /// </summary>
     private void MakeProjectsPathAbsolute()
     {
         if (!Path.IsPathRooted(Config.ProjectsPath))
@@ -64,6 +74,10 @@ public sealed class XmlConfigProvider
         }
     }
 
+    /// <summary>
+    /// Registers the encoding provider and attempts to load the specified encoding.
+    /// </summary>
+    /// <param name="encodingName">Name of the encoding to register and verify.</param>
     private static void TryRegisterEncodingProvider(string encodingName)
     {
         try
