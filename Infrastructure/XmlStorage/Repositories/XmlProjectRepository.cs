@@ -70,8 +70,11 @@ public sealed class XmlProjectRepository : IXmlProjectRepository
     public Task<Project> UpsertAsync(Project project, CancellationToken cancellationToken = default)
     {
         var doc = Load();
-        var root = doc.Root!;
-        var existing = root.Elements("project").FirstOrDefault(x => (string?)x.Attribute("id") == project.Id);
+        var root = doc.Root ?? new XElement("projects");
+
+        var existing = root.Elements("project")
+            .FirstOrDefault(x => (string?)x.Attribute("id") == project.Id);
+
         if (existing is null)
         {
             var node = new XElement("project",
@@ -87,9 +90,12 @@ public sealed class XmlProjectRepository : IXmlProjectRepository
             existing.SetElementValue("abbreviation", project.Abbreviation);
             existing.SetElementValue("customer", project.Customer);
         }
+
         Save(doc);
+
         return Task.FromResult(project);
     }
+
 
     /// <inheritdoc/>
     public Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
@@ -114,7 +120,8 @@ public sealed class XmlProjectRepository : IXmlProjectRepository
 
     private void Save(XDocument doc)
     {
-        using var writer = new StreamWriter(_filePath, false, _encoding);
+        using var fs = new FileStream(_filePath, FileMode.Create, FileAccess.Write, FileShare.None);
+        using var writer = new StreamWriter(fs, _encoding);
         doc.Save(writer);
     }
 

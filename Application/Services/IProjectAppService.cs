@@ -5,7 +5,6 @@ namespace Application.Services;
 /// <summary>
 /// Provides project application operations.
 /// </summary>
-/// <param name="cancellationToken">Optional cancellation token.</param>
 public interface IProjectAppService
 {
     /// <summary>
@@ -24,26 +23,26 @@ public interface IProjectAppService
     Task<ProjectDto?> GetByIdAsync(string id, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Creates a new project.
+    /// Creates a new project. Returns handled result without throwing exceptions.
     /// </summary>
     /// <param name="dto">Project data.</param>
     /// <param name="cancellationToken">Optional cancellation token.</param>
-    /// <returns>Created project.</returns>
-    Task<ProjectDto> CreateAsync(ProjectDto dto, CancellationToken cancellationToken = default);
+    /// <returns>(Ok, Data, Error message).</returns>
+    Task<(bool Ok, ProjectDto? Data, string? Error)> CreateAsync(CreateProjectDto dto, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Updates an existing project.
+    /// Updates an existing project. Returns handled result without throwing exceptions.
     /// </summary>
     /// <param name="dto">Project data.</param>
     /// <param name="cancellationToken">Optional cancellation token.</param>
-    /// <returns>Updated project.</returns>
-    Task<ProjectDto> UpdateAsync(ProjectDto dto, CancellationToken cancellationToken = default);
+    /// <returns>(Ok, Data, Error message).</returns>
+    Task<(bool Ok, ProjectDto? Data, string? Error)> UpdateAsync(ProjectDto dto, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Deletes a project by id.
+    /// Deletes a project by id. Returns handled result without throwing exceptions.
     /// </summary>
     /// <param name="id">Project id.</param>
     /// <param name="cancellationToken">Optional cancellation token.</param>
-    /// <returns>True if deleted.</returns>
-    Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default);
+    /// <returns>(Ok, Error message).</returns>
+    Task<(bool Ok, string? Error)> DeleteAsync(string id, CancellationToken cancellationToken = default);
 }

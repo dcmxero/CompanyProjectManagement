@@ -1,78 +1,113 @@
 ﻿using Application.Dtos;
 using Application.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
 
 /// <summary>
-/// Exposes CRUD endpoints for projects.
+/// Provides endpoints for managing company projects.
 /// </summary>
-/// <remarks>
-/// Initializes a new instance of the ProjectsController class.
-/// </remarks>
-/// <param name="service">Project application service.</param>
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/projects")]
+[Produces("application/json")]
+[Tags("Projects")]
 public sealed class ProjectsController(IProjectAppService service) : ControllerBase
 {
-    private readonly IProjectAppService _service = service;
-
     /// <summary>
-    /// Gets all projects.
+    /// Retrieves all projects.
     /// </summary>
-    /// <param name="cancellationToken">Optional cancellation token.</param>
-    /// <returns>Projects.</returns>
-    [HttpGet]
-    public Task<IReadOnlyList<ProjectDto>> GetAllAsync(CancellationToken cancellationToken = default)
-        => _service.GetAllAsync(cancellationToken);
-
-    /// <summary>
-    /// Gets a project by id.
-    /// </summary>
-    /// <param name="id">Project id.</param>
-    /// <param name="cancellationToken">Optional cancellation token.</param>
-    /// <returns>Project or 404.</returns>
-    [HttpGet("{id}")]
-    public async Task<ActionResult<ProjectDto>> GetByIdAsync(string id, CancellationToken cancellationToken = default)
+    [HttpGet("GetProjects")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IReadOnlyList<ProjectDto>))]
+    public async Task<ActionResult<IReadOnlyList<ProjectDto>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        var item = await _service.GetByIdAsync(id, cancellationToken);
-        if (item is null)
-        {
-            return NotFound();
-        }
-        return item;
+        var items = await service.GetAllAsync(cancellationToken);
+        return Ok(items);
     }
 
     /// <summary>
-    /// Creates a project.
+    /// Retrieves a project by its unique identifier.
     /// </summary>
-    /// <param name="dto">Project data.</param>
-    /// <param name="cancellationToken">Optional cancellation token.</param>
-    /// <returns>Created project.</returns>
-    [HttpPost]
-    public Task<ProjectDto> CreateAsync([FromBody] ProjectDto dto, CancellationToken cancellationToken = default)
-        => _service.CreateAsync(dto, cancellationToken);
-
-    /// <summary>
-    /// Updates a project.
-    /// </summary>
-    /// <param name="dto">Project data.</param>
-    /// <param name="cancellationToken">Optional cancellation token.</param>
-    /// <returns>Updated project.</returns>
-    [HttpPut]
-    public Task<ProjectDto> UpdateAsync([FromBody] ProjectDto dto, CancellationToken cancellationToken = default)
-        => _service.UpdateAsync(dto, cancellationToken);
-
-    /// <summary>
-    /// Deletes a project by id.
-    /// </summary>
-    /// <param name="id">Project id.</param>
-    /// <param name="cancellationToken">Optional cancellation token.</param>
-    /// <returns>No content on success.</returns>
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(string id, CancellationToken cancellationToken = default)
+    [HttpGet("{id}", Name = "GetProjectById")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectDto))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ProjectDto>> GetByIdAsync([FromRoute] string id, CancellationToken cancellationToken = default)
     {
-        var ok = await _service.DeleteAsync(id, cancellationToken);
-        return ok ? NoContent() : NotFound();
+        var item = await service.GetByIdAsync(id, cancellationToken);
+        if (item == null)
+        {
+            return NotFound(new { error = $"Project with id '{id}' was not found." });
+        }
+
+        return Ok(item);
+    }
+
+    /// <summary>
+    /// Creates a new project. Requires Bearer authorization.
+    /// </summary>
+    [HttpPost("CreateProject")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Consumes("application/json")]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ProjectDto))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<ProjectDto>> CreateAsync([FromBody] CreateProjectDto dto, CancellationToken cancellationToken = default)
+    {
+        var (ok, data, error) = await service.CreateAsync(dto, cancellationToken);
+
+        if (!ok)
+        {
+            return BadRequest(new { error });
+        }
+
+        return CreatedAtRoute("GetProjectById", new { id = data!.Id }, data);
+    }
+
+    /// <summary>
+    /// Updates an existing project. Requires Bearer authorization.
+    /// </summary>
+    [HttpPut("UpdateProject")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Consumes("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectDto))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<ProjectDto>> UpdateAsync([FromBody] ProjectDto dto, CancellationToken cancellationToken = default)
+    {
+        var (ok, data, error) = await service.UpdateAsync(dto, cancellationToken);
+
+        if (!ok)
+        {
+            return BadRequest(new { error });
+        }
+
+        return Ok(data);
+    }
+
+    /// <summary>
+    /// Deletes a project by id. Requires Bearer authorization.
+    /// </summary>
+    [HttpDelete("{id}", Name = "DeleteProject")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteAsync([FromRoute] string id, CancellationToken cancellationToken = default)
+    {
+        var (ok, error) = await service.DeleteAsync(id, cancellationToken);
+
+        if (!ok)
+        {
+            if (error != null && error.Contains("not found", StringComparison.OrdinalIgnoreCase))
+            {
+                return NotFound(new { error });
+            }
+
+            return BadRequest(new { error });
+        }
+
+        return NoContent();
     }
 }

@@ -14,19 +14,29 @@ public sealed class XmlConfigProvider
     public XmlStorageConfig Config { get; }
 
     /// <summary>
-    /// Initializes a new instance of the XmlConfigProvider class.
+    /// Gets the authentication configuration.
     /// </summary>
-    /// <param name="configFilePath">Config file path.</param>
+    public AuthConfig Auth { get; }
+
+    public string ConfigDirectory { get; }
+
     public XmlConfigProvider(string configFilePath = "./config.xml")
     {
+        ConfigDirectory = Path.GetDirectoryName(Path.GetFullPath(configFilePath)) ?? Directory.GetCurrentDirectory();
+
         if (!File.Exists(configFilePath))
         {
             Config = new XmlStorageConfig();
+            Auth = new AuthConfig();
+            MakeProjectsPathAbsolute();
+            TryRegisterEncodingProvider(Config.EncodingName);
             return;
         }
 
         var doc = XDocument.Load(configFilePath, LoadOptions.PreserveWhitespace);
         var storage = doc.Root?.Element("storage");
+        var auth = doc.Root?.Element("auth");
+
         var projectsPath = storage?.Element("projectsPath")?.Value?.Trim();
         var encodingName = storage?.Element("encoding")?.Value?.Trim();
 
@@ -35,7 +45,23 @@ public sealed class XmlConfigProvider
             ProjectsPath = string.IsNullOrWhiteSpace(projectsPath) ? "./data/projects.xml" : projectsPath,
             EncodingName = string.IsNullOrWhiteSpace(encodingName) ? "windows-1250" : encodingName
         };
+
+        Auth = new AuthConfig
+        {
+            Username = auth?.Element("username")?.Value ?? "admin",
+            Password = auth?.Element("passwordHash")?.Value ?? string.Empty
+        };
+
+        MakeProjectsPathAbsolute();
         TryRegisterEncodingProvider(Config.EncodingName);
+    }
+
+    private void MakeProjectsPathAbsolute()
+    {
+        if (!Path.IsPathRooted(Config.ProjectsPath))
+        {
+            Config.ProjectsPath = Path.GetFullPath(Path.Combine(ConfigDirectory, Config.ProjectsPath));
+        }
     }
 
     private static void TryRegisterEncodingProvider(string encodingName)
@@ -45,9 +71,6 @@ public sealed class XmlConfigProvider
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _ = Encoding.GetEncoding(encodingName);
         }
-        catch
-        {
-            // Fallback remains UTF-8 if invalid encoding is configured.
-        }
+        catch { }
     }
 }

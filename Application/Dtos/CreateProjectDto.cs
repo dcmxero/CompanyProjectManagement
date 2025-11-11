@@ -1,15 +1,10 @@
 ﻿namespace Application.Dtos;
 
 /// <summary>
-/// Data transfer object for Project update.
+/// Data transfer object for Project.
 /// </summary>
-public sealed class ProjectDto
+public class CreateProjectDto
 {
-    /// <summary>
-    /// Gets or sets the project identifier.
-    /// </summary>
-    public string Id { get; set; } = string.Empty;
-
     /// <summary>
     /// Gets or sets the project name.
     /// </summary>
