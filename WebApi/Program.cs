@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
+using System.Reflection;
 using System.Xml.Linq;
 using WebApi.Auth;
 
@@ -137,18 +138,23 @@ builder.Services.AddSwaggerGen(options =>
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
+        { new OpenApiSecurityScheme
+            { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } },
+          Array.Empty<string>() }
     });
+
+    // ---- DÔLEŽITÉ: načítaj XML summary súbory ----
+    var webApiXml = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var webApiXmlPath = Path.Combine(AppContext.BaseDirectory, webApiXml);
+    if (File.Exists(webApiXmlPath))
+        options.IncludeXmlComments(webApiXmlPath, includeControllerXmlComments: true);
+
+    // Ak chceš, aby sa zobrazovali popisy aj z DTO (Application projekt):
+    var appAsm = typeof(Application.Dtos.ProjectDto).Assembly;
+    var appXml = $"{appAsm.GetName().Name}.xml";
+    var appXmlPath = Path.Combine(AppContext.BaseDirectory, appXml);
+    if (File.Exists(appXmlPath))
+        options.IncludeXmlComments(appXmlPath);
 });
 
 // ============================================================================
