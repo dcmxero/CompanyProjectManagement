@@ -97,12 +97,28 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// 0) CONST názov politiky
+const string FrontendCors = "FrontendCors";
+
+// 1) Services
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(FrontendCors, policy =>
+        policy.WithOrigins("http://localhost:4200") // Angular dev server
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+    // .AllowCredentials()
+    );
+});
+
 var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseAuthentication();   // pred UseAuthorization
+app.UseCors(FrontendCors);
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "compounds": [
+    {
+      "name": "Run API + Web",
+      "configurations": [".NET API", "Angular (Chrome)"]
+    }
+  ],
+  "configurations": [
+    {
+      "name": ".NET API",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "dotnet",
+      "args": ["run", "--project", "${workspaceFolder}/WebApi/WebApi.csproj"],
+      "cwd": "${workspaceFolder}/WebApi",
+      "console": "integratedTerminal",
+      "serverReadyAction": {
+        "pattern": "Now listening on:\\s*(https?://\\S+)",
+        "uriFormat": "%s/swagger",
+        "action": "openExternally"
+      }
+    },
+    {
+      "name": "Angular (Chrome)",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}/WebClient",
+      "preLaunchTask": "web:serve"
+    }
+  ]
+}
