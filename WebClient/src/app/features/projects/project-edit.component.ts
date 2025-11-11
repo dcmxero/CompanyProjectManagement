@@ -106,7 +106,7 @@ export class ProjectEditComponent implements OnInit {
       });
     } else {
       value.id = this.id;
-      this.api.update(this.id, value).subscribe({
+      this.api.update(value).subscribe({
         next: (_) => this.router.navigate(['/projects']),
         error: (e) => (this.error = e?.error?.error ?? 'Update failed'),
       });
