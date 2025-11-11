@@ -6,7 +6,38 @@ Frontend je vytvorený v **Angulari** a komunikuje s API cez HTTP.
 
 ---
 
+## 💡 Dôvody výberu technológií
+
+Pre implementáciu backendu som si zvolil **.NET (C#)**, pretože s touto technológiou mám dlhoročné skúsenosti a dobre ju poznám z praxe.  
+ASP.NET Core poskytuje stabilné, výkonné a prehľadné prostredie pre tvorbu REST API, takže bol prirodzenou voľbou pre serverovú časť projektu.
+
+Naopak, pre frontend som si zvolil **Angular**, s ktorým som už dlhšie nepracoval.  
+Projekt som preto využil ako príležitosť na **obnovenie znalostí Angularu**, hlavne v oblasti **Reactive Forms**, komunikácie s API a práce so **standalone komponentmi**.
+
+Kombinácia .NET a Angular umožňuje jasné oddelenie backendu a frontendu, moderný vývojový proces a typovo bezpečné riešenie na oboch stranách aplikácie.
+
+---
+
+## 🏗️ Architektúra riešenia
+
+Projekt je rozdelený na dve časti:
+
+- **WebApi (C# / ASP.NET Core)** – serverová časť poskytujúca REST API, spracováva CRUD operácie a zapisuje dáta do XML.
+- **WebClient (Angular)** – klientská aplikácia komunikujúca s API cez HTTP, zobrazujúca projekty a formuláre pre ich úpravu.
+
+Komunikácia medzi klientom a serverom prebieha cez HTTP vo formáte JSON.
+
+---
+
 ## 🧩 Použité technológie
+
+### 🧰 Vývojové prostredie a nástroje
+
+- **Visual Studio 2022** – vývoj backendu, ladenie API, správa závislostí a konfigurácií.  
+- **Visual Studio Code** – vývoj frontendu, úprava HTML, CSS a TypeScript kódu.  
+- **Angular CLI** – generovanie komponentov, buildovanie a spúšťanie Angular aplikácie.  
+- **Swagger UI (Swashbuckle)** – interaktívne testovanie a automatická dokumentácia API.  
+- **Serilog** – logovanie udalostí na strane servera pre jednoduchšie ladenie a sledovanie chýb.
 
 ### Backend (.NET)
 - **ASP.NET Core Web API** – REST rozhranie pre operácie s projektmi  
@@ -20,11 +51,11 @@ Frontend je vytvorený v **Angulari** a komunikuje s API cez HTTP.
 - **RxJS** – reakčné programovanie  
 - **HttpClient** – komunikácia s backendom  
 
----
-
 ### Konfigurácia projektu
 - Projekt používa XML konfiguráciu pre prihlasovanie, logovanie a cesty k dátam.
 - Súbor sa nachádza v priečinku Config/config.xml.
+- Prihlasovacie údaje (username: admin, password: Admin123) sú uložené v tomto súbore.
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
@@ -131,11 +162,64 @@ Dáta o projektoch sa ukladajú do súboru `projects.xml` v nasledujúcej štruk
 
 ---
 
+## ✅ Validácia vstupov
+
+Validácia údajov sa vykonáva **na strane frontendu** pomocou Angular Reactive Forms.  
+Formulár kontroluje, či sú všetky povinné polia vyplnené (`Validators.required`) a zobrazuje používateľovi chybové hlášky priamo v rozhraní.
+
+---
+
+## 🧾 Logovanie
+
+Aplikácia využíva knižnicu **Serilog** na zaznamenávanie udalostí.  
+Logy sa zapisujú do súborov v priečinku `logs` podľa konfigurácie v `config.xml`.
+
+Logujú sa:
+- spustenie aplikácie  
+- úspešné / neúspešné požiadavky  
+- chyby pri čítaní alebo zápise XML
+
+---
+
 ## 🧠 Poznámky
 
 - Projekt **nepoužíva databázu**, všetky dáta sú uložené v XML súbore.  
 - Po vypnutí aplikácie zostávajú dáta zachované.  
-```
+
+---
+
+## 🔧 Možnosti rozšírenia
+
+Do budúcnosti je možné aplikáciu rozšíriť bez väčších zásahov do architektúry:
+
+### 💾 Podpora pre databázu (SQL Server, SQLite)
+Aktuálne sa projekty ukladajú do XML súboru.  
+Službu `ProjectsService` by bolo možné jednoducho nahradiť implementáciou, ktorá využíva **Entity Framework Core**.  
+Stačí:
+- vytvoriť databázový kontext (`DbContext`) s entitou `Project`,
+- nakonfigurovať pripojenie v `appsettings.json`,
+- upraviť dependency injection, aby aplikácia používala novú implementáciu služby (napr. `IProjectsRepository`),
+- spustiť migrácie (`dotnet ef migrations add Init` a `dotnet ef database update`).
+
+Tým by sa perzistencia presunula z XML do databázy bez zmeny API vrstvy ani Angular frontendu.
+
+### 🔐 Autentifikácia pomocou JWT tokenov
+
+Aplikácia využíva **JWT autentifikáciu** pre prihlásenie používateľa.
+
+Prihlasovacie údaje sa načítavajú z konfiguračného XML súboru (`Config/config.xml`).  
+Po úspešnom prihlásení API vygeneruje **JWT token** (pomocou knižnice `System.IdentityModel.Tokens.Jwt`),  
+ktorý klient (Angular) uloží do `localStorage` a následne ho automaticky pridáva do hlavičky každého HTTP volania:
+- Token je následne overovaný middleware-om v `Program.cs`, čím je zabezpečený prístup k chráneným API endpointom.
+
+### 👥 Správa používateľov a rolí
+
+Na autentifikáciu sa momentálne používa jeden účet definovaný v XML súbore.  
+Jednoduchým rozšírením by bolo pridať:
+- správu používateľov v osobitnom XML alebo databáze,
+- definovanie rolí (napr. **admin**, **user**),
+- a kontrolu prístupu pomocou `[Authorize(Roles = "...")]` atribútov v controlleroch.
+
 
 ---
 
