@@ -1,0 +1,121 @@
+:host {
+  display: block;
+}
+
+/* Fixed logout */
+.fixed-toolbar {
+  position: fixed;
+  top: 16px;
+  right: 24px;
+  z-index: 120;
+}
+.fixed-toolbar-inner {
+  display: block;
+}
+.logout-fab {
+  padding: 8px 20px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.logout-fab:hover {
+  background: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Page / Card */
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 96px 16px 48px;
+}
+.card {
+  width: min(1040px, 96vw);
+  margin: 0 auto;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+}
+.bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.bar h2 {
+  margin: 0;
+  font-size: 26px;
+}
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Grid */
+.grid {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+.grid th,
+.grid td {
+  padding: 16px 14px;
+  border-bottom: 1px solid #eef1f4;
+}
+.grid th:first-child,
+.grid td:first-child {
+  text-align: left;
+}
+.grid tbody tr:hover {
+  background: #fafbfd;
+}
+.empty {
+  opacity: 0.7;
+  padding: 18px 4px;
+}
+
+.right {
+  text-align: center;
+}
+.err {
+  color: crimson;
+  margin-top: 10px;
+}
+
+/* Buttons */
+.btn {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.btn.sm {
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+.btn.primary {
+  background: #2d6cdf;
+  color: #fff;
+  border-color: #2d6cdf;
+}
+.btn.danger {
+  color: #d9534f;
+  border-color: #d9534f;
+  background: #fff;
+}
+
+@media (max-width: 520px) {
+  .page {
+    padding-top: 112px;
+  }
+}

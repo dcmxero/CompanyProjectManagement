@@ -16,7 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
 // ============================================================================
 //  Serilog z Config/config.xml
 // ============================================================================
-var contentRoot = builder.Environment.ContentRootPath;
+var projectRoot = builder.Environment.ContentRootPath;
+var contentRoot = Directory.GetParent(projectRoot)!.FullName;
 var configPath = Path.Combine(contentRoot, "Config", "config.xml");
 
 string logPathAbs = Path.Combine(contentRoot, "logs", "app-.log");
