@@ -95,6 +95,10 @@ npm install -g @angular/cli
 
 ## 🚀 Spustenie projektu
 
+> 📝 **Poznámka:**  
+> Všetky príkazy nižšie predpokladajú, že sa nachádzate v koreňovom priečinku projektu,  
+> kde sa nachádza súbor `*.sln`.
+
 ### 1️⃣ Backend – API
 ```bash
 cd WebApi
