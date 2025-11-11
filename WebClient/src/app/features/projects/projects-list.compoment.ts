@@ -94,9 +94,6 @@ import { ProjectsService, ProjectDto, CreateProjectDto } from '../../services/pr
             <button class="btn primary" type="submit" [disabled]="form.invalid">
               {{ isNew ? 'Create' : 'Save' }}
             </button>
-            <button *ngIf="!isNew" class="btn danger" type="button" (click)="remove(currentId!)">
-              Delete
-            </button>
           </div>
         </form>
       </div>
@@ -273,13 +270,15 @@ import { ProjectsService, ProjectDto, CreateProjectDto } from '../../services/pr
       }
       .modal-close {
         position: absolute;
-        top: 1px;
-        right: 0;
+        top: 8px;
+        right: 8px;
         width: 28px;
         height: 28px;
+        background: transparent; /* bez rámčeka */
+        border: none; /* bez rámčeka */
+        padding: 0;
         display: grid;
         place-items: center;
-        background: #eef2f7;
         cursor: pointer;
       }
       .modal-close:hover {
